@@ -93,63 +93,63 @@
   <div id="result"></div>
 
   <script>
-  const apiURL = "https://script.google.com/macros/s/AKfycbxa0e1uC_GLcLDUxEeSANsOOzERS9jDzMhBTRE5ucy9pOiQBn2chQNG1dBQ8-JIpaOP/exec";
+    const apiURL = "https://script.google.com/macros/s/AKfycbxa0eluC_GLcLDUxEeSANs00zERS9jDzMhBTRE5ucy9pOiQBn2/exec";
 
-  async function searchData() {
-    const type = document.getElementById("searchType").value;
-    const keyword = document.getElementById("searchInput").value.trim();
-    const resultDiv = document.getElementById("result");
+    async function searchData() {
+      const type = document.getElementById("searchType").value;
+      const keyword = document.getElementById("searchInput").value.trim();
+      const resultDiv = document.getElementById("result");
 
-    if (!keyword) {
-      resultDiv.innerHTML = "<p style='background:#fff3cd;border:1px solid #ffeeba;border-radius:5px;padding:10px;'>⚠️ 請輸入姓名。</p>";
-      return;
-    }
-
-    resultDiv.innerHTML = "<p>🔄 查詢中，請稍候...</p>";
-
-    try {
-      // 根據搜尋類型決定查詢參數
-      const param = type === "name" ? name=${encodeURIComponent(keyword)} : `contact=${encodeURIComponent(keyword)}`;
-      const response = await fetch(`${apiURL}?${param}`);
-      const data = await response.json();
-
-      if (Array.isArray(data)) {
-        if (data.length === 0) {
-          resultDiv.innerHTML = "<p>❌ 查無此資料。</p>";
-        } else {
-          resultDiv.innerHTML = data.map(item => `
-            <div>
-              <p><strong>亡者：</strong>${item["亡者"]}</p>
-              <p><strong>案件來源：</strong>${item["案件來源"]}</p>
-              <p><strong>業務：</strong>${item["業務"]}</p>
-              <p><strong>執案人1：</strong>${item["執案人1"]}</p>
-              <p><strong>執案人2：</strong>${item["執案人2"]}</p>
-              <p><strong>祭日國曆：</strong>${item["祭日國曆"]}</p>
-              <p><strong>百日國曆：</strong>${item["百日國曆"]}</p>
-              <p><strong>對年國曆：</strong>${item["對年國曆"]}</p>
-              <p><strong>聯絡人：</strong>${item["聯絡人"]}</p>
-              <p><strong>行動電話：</strong>${item["行動電話"]}</p>
-              <p><strong>地址：</strong>${item["地址"]}</p>
-            </div>
-          `).join('');
-        }
-      } else if (data.error) {
-        resultDiv.innerHTML = `<p>❌ ${data.error}</p>`;
+      if (!keyword) {
+        resultDiv.innerHTML = "<p style='background:#fff3cd;border:1px solid #ffeeba;border-radius:5px;padding:10px;'>⚠️ 請輸入姓名。</p>";
+        return;
       }
-    } catch (err) {
-      resultDiv.innerHTML = "<p>⚠️ 連線錯誤，請稍後再試。</p>";
-      console.error(err);
-    }
 
-    document.getElementById("searchInput").value = "";
-  }
+      resultDiv.innerHTML = "<p>🔄 查詢中，請稍候...</p>";
 
-  // 讓 Enter 鍵可查詢
-  document.getElementById("searchInput").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      searchData();
+      try {
+        const param = type === "name" 
+          ? `name=${encodeURIComponent(keyword)}` 
+          : `contact=${encodeURIComponent(keyword)}`;
+        const response = await fetch(`${apiURL}?${param}`);
+        
+        if (!response.ok) {
+          resultDiv.innerHTML = `<p>⚠️ 錯誤：${response.status} ${response.statusText}</p>`;
+          return;
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          if (data.length === 0) {
+            resultDiv.innerHTML = "<p>❌ 查無此資料。</p>";
+          } else {
+            resultDiv.innerHTML = data.map(item => `
+              <div>
+                <p><strong>亡者：</strong>${item["亡者"]}</p>
+                <p><strong>案件來源：</strong>${item["案件來源"]}</p>
+                <p><strong>業務：</strong>${item["業務"]}</p>
+                <p><strong>執案人1：</strong>${item["執案人1"]}</p>
+                <p><strong>執案人2：</strong>${item["執案人2"]}</p>
+                <p><strong>祭日國曆：</strong>${item["祭日國曆"]}</p>
+                <p><strong>百日國曆：</strong>${item["百日國曆"]}</p>
+                <p><strong>對年國曆：</strong>${item["對年國曆"]}</p>
+                <p><strong>聯絡人：</strong>${item["聯絡人"]}</p>
+                <p><strong>行動電話：</strong>${item["行動電話"]}</p>
+                <p><strong>地址：</strong>${item["地址"]}</p>
+              </div>
+            `).join('');
+          }
+        } else if (data.error) {
+          resultDiv.innerHTML = `<p>❌ ${data.error}</p>`;
+        }
+      } catch (err) {
+        resultDiv.innerHTML = "<p>⚠️ 連線錯誤，請稍後再試。</p>";
+        console.error(err);
+      }
+
+      document.getElementById("searchInput").value = "";
     }
-  });
   </script>
 </body>
 </html>
